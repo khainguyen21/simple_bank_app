@@ -5,17 +5,19 @@ import db_objs.User;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /*
     Displays a custom dialog for our BankingAppGui
  */
-public class BankingAppDialog extends JDialog {
+public class BankingAppDialog extends JDialog implements ActionListener {
     private User user;
     private BankingAppGui bankingAppGui;
 
-    private JLabel balanceLabel, enterAmountLabel;
-    private JTextField enterAmountField;
-
+    private JLabel balanceLabel, enterAmountLabel, enterUserLabel;
+    private JTextField enterAmountField, enterUserField;
+    private JButton actionButton;
 
     public BankingAppDialog (BankingAppGui bankingAppGui, User user)
     {
@@ -42,7 +44,8 @@ public class BankingAppDialog extends JDialog {
         // we will need to access to the user info to make updates to our database or retrieve data about the user
         this.user = user;
 
-        //addCurrentBalanceAndAmount();
+        addCurrentBalanceAndAmount();
+
     }
 
     public void addCurrentBalanceAndAmount()
@@ -53,6 +56,52 @@ public class BankingAppDialog extends JDialog {
         balanceLabel.setFont(new Font("Dialog", Font.BOLD, 16));
         balanceLabel.setHorizontalAlignment(SwingConstants.CENTER);
         add(balanceLabel);
+
+        // enter amount label
+        enterAmountLabel = new JLabel("Enter Amount: ");
+        enterAmountLabel.setBounds(0, 60, getWidth() - 20, 20);
+        enterAmountLabel.setFont(new Font("Dialog", Font.BOLD, 16));
+        enterAmountLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        add(enterAmountLabel);
+
+        // enter amount field
+        enterAmountField = new JTextField();
+        enterAmountField.setBounds(15, 80, getWidth() - 50, 40);
+        enterAmountField.setFont(new Font("Dialog", Font.BOLD, 20));
+        enterAmountField.setHorizontalAlignment(SwingConstants.CENTER);
+        add(enterAmountField);
+
+    }
+
+    // display actions between deposit, withdraw, and transfer
+    public void addActionButton (String action)
+    {
+        actionButton = new JButton(action);
+        actionButton.setBounds(15, 300, getWidth() - 50, 40);
+        actionButton.setFont(new Font("Dialog", Font.BOLD, 20));
+        actionButton.setHorizontalAlignment(SwingConstants.CENTER);
+        add(actionButton);
+    }
+
+    public void addUserField()
+    {
+        // enter user label
+        enterUserLabel = new JLabel("Enter username: ");
+        enterUserLabel.setBounds(0, 160, getWidth() - 20, 20);
+        enterUserLabel.setFont(new Font("Dialog", Font.BOLD, 16));
+        enterUserLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        add(enterUserLabel);
+
+        // enter user field
+        enterUserField = new JTextField();
+        enterUserField.setBounds(15, 180, getWidth() - 50, 40);
+        enterUserField.setFont(new Font("Dialog", Font.BOLD, 20));
+        enterUserField.setHorizontalAlignment(SwingConstants.CENTER);
+        add(enterUserField);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
 
     }
 }
