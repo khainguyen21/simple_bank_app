@@ -10,7 +10,7 @@ import java.util.Date;
 
 public class Transaction {
     private final int userId;
-    private final String transcationType;
+    private final String transactionType;
     private final BigDecimal transactionAmount;
     private final Date transactionDate;
 
@@ -19,8 +19,8 @@ public class Transaction {
         return userId;
     }
 
-    public String getTranscationType() {
-        return transcationType;
+    public String transactionType() {
+        return transactionType;
     }
 
     public BigDecimal getTransactionAmount() {
@@ -31,10 +31,10 @@ public class Transaction {
         return transactionDate;
     }
 
-    public Transaction(int userId, String transcationType, BigDecimal transactionAmount, Date transactionDate)
+    public Transaction(int userId, String transactionType, BigDecimal transactionAmount, Date transactionDate)
     {
         this.userId = userId;
-        this.transcationType = transcationType;
+        this.transactionType = transactionType;
         this.transactionAmount = transactionAmount;
         this.transactionDate = transactionDate;
     }

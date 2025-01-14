@@ -1,12 +1,14 @@
 package GUIS;
 
 
+import db_objs.Transaction;
 import db_objs.User;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.math.BigDecimal;
 
 /*
     Displays a custom dialog for our BankingAppGui
@@ -100,8 +102,43 @@ public class BankingAppDialog extends JDialog implements ActionListener {
         add(enterUserField);
     }
 
+    public void handleTransaction (String transactionType, float amountVal)
+    {
+        Transaction transaction;
+
+        if (transactionType.equalsIgnoreCase("Deposit")) {
+            // deposit transaction type
+            // add to current balance
+            user.setCurrentBalance(user.getCurrentBalance().add(BigDecimal.valueOf(amountVal)));
+
+            // create transaction
+            // we leave date null because we are going to be using the NOW() in sql which will get the current date
+            transaction = new Transaction(user.getId(), transactionType, BigDecimal.valueOf(amountVal), null);
+        }
+        else {
+            // withdraw transaction type
+            // subtract to current balance
+            user.setCurrentBalance(user.getCurrentBalance().subtract(BigDecimal.valueOf(amountVal)));
+
+            // we want to show a negative sign for the amount val when withdrawing
+            transaction = new Transaction(user.getId(), transactionType, BigDecimal.valueOf(-amountVal), null);
+        }
+
+        // update database
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
+        String buttonPressed = e.getActionCommand();
 
+        // get amount val
+        float amountVal = Float.parseFloat(enterAmountField.getText());
+
+        // pressed deposit
+        if (buttonPressed.equalsIgnoreCase("Deposit"))
+        {
+            // we want to handle the deposit transaction
+            //handleTransaction("Deposit", );
+        }
     }
 }

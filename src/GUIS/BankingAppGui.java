@@ -94,8 +94,9 @@ public class BankingAppGui extends BaseFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        String buttonPressed = e.getActionCommand();
 
+        // Get string of a button that user click on
+        String buttonPressed = e.getActionCommand();
 
         if (buttonPressed.equalsIgnoreCase("Logout"))
         {
@@ -126,8 +127,9 @@ public class BankingAppGui extends BaseFrame implements ActionListener {
                 if (buttonPressed.equalsIgnoreCase("Transfer"))
                 {
                     bankingAppDialog.addUserField();
-                    bankingAppDialog.setVisible(true);
                 }
+
+                bankingAppDialog.setVisible(true);
             }
         }
 

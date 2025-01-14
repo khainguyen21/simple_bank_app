@@ -13,9 +13,8 @@ public class MyJDBC {
     private static final String DB_PASSWORD = "Khai211004@";
 
     // if valid return an object with the user's information
-    public static User validateLogin (String username, String password)
-    {
-        try{
+    public static User validateLogin(String username, String password) {
+        try {
 
             // Establish a connection to the database using configurations
             Connection con = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);
@@ -36,8 +35,7 @@ public class MyJDBC {
             // .next() returns true or false
             // true - query returned data and result set now points to the first row
             // false - query returned no data and result set equals to null
-            if (resultSet.next())
-            {
+            if (resultSet.next()) {
                 // success
                 // get id
                 int userID = resultSet.getInt("id");
@@ -49,8 +47,7 @@ public class MyJDBC {
                 return new User(userID, username, password, currentBalance);
             }
 
-        }catch (SQLException e)
-        {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
 
@@ -61,13 +58,10 @@ public class MyJDBC {
     // registers new user to the database
     // true - register success
     // false - register fail
-    public static boolean register(String username , String password)
-    {
-        try
-        {
+    public static boolean register(String username, String password) {
+        try {
             // first we will need to check if the username has already been taken
-            if (!checkUser(username))
-            {
+            if (!checkUser(username)) {
                 Connection connection = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);
 
                 PreparedStatement preparedStatement = connection.prepareStatement(
@@ -82,8 +76,7 @@ public class MyJDBC {
                 return true;
             }
 
-        }catch (SQLException e)
-        {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
 
@@ -94,8 +87,7 @@ public class MyJDBC {
     // check if username already exists in the database
     // true - user exists
     // false - user doesn't exist
-    private static boolean checkUser (String username)
-    {
+    private static boolean checkUser(String username) {
         try {
             Connection connection = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);
 
@@ -105,14 +97,37 @@ public class MyJDBC {
 
             preparedStatement.setString(1, username);
             ResultSet resultSet = preparedStatement.executeQuery();
-            if (!resultSet.next())
-            {
+            if (!resultSet.next()) {
                 return false;
             }
-        }catch (SQLException e)
-        {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return true;
+    }
+
+
+    public static boolean addTransactionToDataBase(Transaction transaction) {
+        try {
+            Connection connection = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);
+
+            PreparedStatement insertTransaction = connection.prepareStatement(
+                    "INSERT transactions(user_id, transaction_amount, transaction_type, transaction_date)" +
+                            "VALUE(?, ?, ?, NOW())"
+            );
+
+            // NOW() will put in the current date
+            insertTransaction.setInt(1, transaction.getUserId());
+            insertTransaction.setBigDecimal(2, transaction.getTransactionAmount());
+            insertTransaction.setString(3, transaction.transactionType());
+
+            // execute
+            insertTransaction.executeUpdate();
+
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }
