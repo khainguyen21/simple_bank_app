@@ -71,7 +71,7 @@ public class MyJDBC {
 
                 preparedStatement.setString(1, username);
                 preparedStatement.setString(2, password);
-                preparedStatement.setInt(3, 0);
+                preparedStatement.setBigDecimal(3, new BigDecimal(0));
                 preparedStatement.executeUpdate();
                 return true;
             }
@@ -112,20 +112,45 @@ public class MyJDBC {
             Connection connection = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);
 
             PreparedStatement insertTransaction = connection.prepareStatement(
-                    "INSERT transactions(user_id, transaction_amount, transaction_type, transaction_date)" +
+                    "INSERT transactions(user_id, transaction_type, transaction_amount, transaction_date)" +
                             "VALUE(?, ?, ?, NOW())"
             );
 
             // NOW() will put in the current date
             insertTransaction.setInt(1, transaction.getUserId());
-            insertTransaction.setBigDecimal(2, transaction.getTransactionAmount());
-            insertTransaction.setString(3, transaction.transactionType());
+            insertTransaction.setString(2, transaction.transactionType());
+            insertTransaction.setBigDecimal(3, transaction.getTransactionAmount());
 
             // execute
             insertTransaction.executeUpdate();
 
             return true;
         } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+
+    // true - update balance successful
+    // false - update balance fail
+    public static boolean updateCurrentBalance(User user)
+    {
+        try {
+            Connection connection = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);
+
+            PreparedStatement updateBalance = connection.prepareStatement(
+                    "UPDATE users SET current_balance = ? WHERE id = ?");
+
+
+            updateBalance.setBigDecimal(1, user.getCurrentBalance());
+            updateBalance.setInt(2, user.getId());
+
+            updateBalance.executeUpdate();
+
+            return true;
+        }catch (SQLException e)
+        {
             e.printStackTrace();
         }
         return false;

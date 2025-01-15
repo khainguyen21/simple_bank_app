@@ -1,6 +1,7 @@
 package GUIS;
 
 
+import db_objs.MyJDBC;
 import db_objs.Transaction;
 import db_objs.User;
 
@@ -45,9 +46,7 @@ public class BankingAppDialog extends JDialog implements ActionListener {
 
         // we will need to access to the user info to make updates to our database or retrieve data about the user
         this.user = user;
-
-        addCurrentBalanceAndAmount();
-
+        //addCurrentBalanceAndAmount();
     }
 
     public void addCurrentBalanceAndAmount()
@@ -70,7 +69,7 @@ public class BankingAppDialog extends JDialog implements ActionListener {
         enterAmountField = new JTextField();
         enterAmountField.setBounds(15, 80, getWidth() - 50, 40);
         enterAmountField.setFont(new Font("Dialog", Font.BOLD, 20));
-        enterAmountField.setHorizontalAlignment(SwingConstants.CENTER);
+        enterAmountField.setHorizontalAlignment(SwingConstants.RIGHT);
         add(enterAmountField);
 
     }
@@ -82,7 +81,9 @@ public class BankingAppDialog extends JDialog implements ActionListener {
         actionButton.setBounds(15, 300, getWidth() - 50, 40);
         actionButton.setFont(new Font("Dialog", Font.BOLD, 20));
         actionButton.setHorizontalAlignment(SwingConstants.CENTER);
+        actionButton.addActionListener(this);
         add(actionButton);
+
     }
 
     public void addUserField()
@@ -109,22 +110,51 @@ public class BankingAppDialog extends JDialog implements ActionListener {
         if (transactionType.equalsIgnoreCase("Deposit")) {
             // deposit transaction type
             // add to current balance
-            user.setCurrentBalance(user.getCurrentBalance().add(BigDecimal.valueOf(amountVal)));
+            user.setCurrentBalance(user.getCurrentBalance().add(new BigDecimal(amountVal)));
 
             // create transaction
             // we leave date null because we are going to be using the NOW() in sql which will get the current date
-            transaction = new Transaction(user.getId(), transactionType, BigDecimal.valueOf(amountVal), null);
+            transaction = new Transaction(user.getId(), transactionType, new BigDecimal(amountVal), null);
         }
         else {
             // withdraw transaction type
             // subtract to current balance
-            user.setCurrentBalance(user.getCurrentBalance().subtract(BigDecimal.valueOf(amountVal)));
+            user.setCurrentBalance(user.getCurrentBalance().subtract(new BigDecimal(amountVal)));
 
             // we want to show a negative sign for the amount val when withdrawing
-            transaction = new Transaction(user.getId(), transactionType, BigDecimal.valueOf(-amountVal), null);
+            transaction = new Transaction(user.getId(), transactionType, new BigDecimal(-amountVal), null);
         }
 
         // update database
+        if(MyJDBC.addTransactionToDataBase(transaction) && MyJDBC.updateCurrentBalance(user)){
+            // show success dialog
+            JOptionPane.showMessageDialog(this, transactionType + " Successfully");
+
+            // reset the fields
+            resetFieldsAndUpdateCurrentBalance();
+        }
+        else{
+            // show failure dialog
+            JOptionPane.showMessageDialog(this, transactionType + " Failed");
+
+        }
+    }
+
+    private void resetFieldsAndUpdateCurrentBalance()
+    {
+        // reset all the fields
+        enterAmountField.setText("");
+
+        // only appears when transfer is clicked
+        if (enterUserField != null)
+        {
+            enterUserField.setText("");
+        }
+
+        // update current balance on the dialog
+        balanceLabel.setText("Balance: $" + user.getCurrentBalance());
+
+        bankingAppGui.getCurrentBalance().setText("$ " + user.getCurrentBalance());
     }
 
     @Override
@@ -133,12 +163,11 @@ public class BankingAppDialog extends JDialog implements ActionListener {
 
         // get amount val
         float amountVal = Float.parseFloat(enterAmountField.getText());
-
         // pressed deposit
         if (buttonPressed.equalsIgnoreCase("Deposit"))
         {
             // we want to handle the deposit transaction
-            //handleTransaction("Deposit", );
+            handleTransaction(buttonPressed, amountVal);
         }
     }
 }

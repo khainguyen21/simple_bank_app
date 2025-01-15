@@ -123,6 +123,7 @@ public class BankingAppGui extends BaseFrame implements ActionListener {
                 // distinguish action between deposit, withdraw, and transfer
                 bankingAppDialog.addActionButton(buttonPressed);
 
+
                 // for the transfer action it will require more components
                 if (buttonPressed.equalsIgnoreCase("Transfer"))
                 {

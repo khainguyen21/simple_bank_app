@@ -6,7 +6,6 @@ import java.math.RoundingMode;
 
 /*
     User entity which is used to store user information (i.e. id, username, password, and current balance)
-
  */
 public class User {
 
@@ -38,8 +37,9 @@ public class User {
         return currentBalance;
     }
 
+
     public void setCurrentBalance(BigDecimal currentBalance)
     {
-        currentBalance = this.currentBalance.setScale(2, RoundingMode.FLOOR);
+        this.currentBalance = currentBalance.setScale(2, RoundingMode.FLOOR);
     }
 }
