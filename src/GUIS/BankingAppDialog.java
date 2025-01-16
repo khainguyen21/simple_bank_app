@@ -1,6 +1,5 @@
 package GUIS;
 
-
 import db_objs.MyJDBC;
 import db_objs.Transaction;
 import db_objs.User;
@@ -118,11 +117,11 @@ public class BankingAppDialog extends JDialog implements ActionListener {
         }
         else {
             // withdraw transaction type
-            // subtract to current balance
             user.setCurrentBalance(user.getCurrentBalance().subtract(new BigDecimal(amountVal)));
 
             // we want to show a negative sign for the amount val when withdrawing
             transaction = new Transaction(user.getId(), transactionType, new BigDecimal(-amountVal), null);
+
         }
 
         // update database
@@ -163,11 +162,39 @@ public class BankingAppDialog extends JDialog implements ActionListener {
 
         // get amount val
         float amountVal = Float.parseFloat(enterAmountField.getText());
-        // pressed deposit
-        if (buttonPressed.equalsIgnoreCase("Deposit"))
+
+        // make sure input amount is positive
+        if (amountVal >=0)
         {
-            // we want to handle the deposit transaction
-            handleTransaction(buttonPressed, amountVal);
+            // pressed deposit
+            if (buttonPressed.equalsIgnoreCase("Deposit")) {
+                // we want to handle the deposit transaction
+                handleTransaction(buttonPressed, amountVal);
+            }
+
+            // pressed transfer and withdraw
+            else {
+            // validate input amount by check if withdraw or transfer amount is less than current balance
+                int result = user.getCurrentBalance().compareTo(new BigDecimal(amountVal));
+                if (result < 0) {
+                    JOptionPane.showMessageDialog(this, "Error: Input value is more than current balance.");
+                    return;
+                }
+
+                // otherwise implement withdraw
+                if (buttonPressed.equalsIgnoreCase("Withdraw")) {
+                    handleTransaction(buttonPressed, amountVal);
+                }
+                else
+                {
+
+                }
+            }
         }
+        else {
+            JOptionPane.showMessageDialog(this, "Error: Cannot input negative amount.");
+        }
+
+
     }
 }
