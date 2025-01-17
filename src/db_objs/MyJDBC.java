@@ -131,7 +131,6 @@ public class MyJDBC {
         return false;
     }
 
-
     // true - update balance successful
     // false - update balance fail
     public static boolean updateCurrentBalance(User user)
@@ -153,6 +152,67 @@ public class MyJDBC {
         {
             e.printStackTrace();
         }
+        return false;
+    }
+
+
+    public static boolean transfer(User user, String transferredUsername, float transferAmount)
+    {
+        try
+        {
+            Connection connection = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);
+
+            PreparedStatement queryUser = connection.prepareStatement(
+                    "SELECT * FROM users WHERE username = ?");
+
+            queryUser.setString(1, transferredUsername);
+            ResultSet result = queryUser.executeQuery();
+
+            while (result.next())
+            {
+                // perform transfer
+                User transferredUser = new User(
+                        result.getInt("id"),
+                        transferredUsername,
+                        result.getString("password"),
+                        result.getBigDecimal("current_balance")
+                );
+
+                // create transaction
+                Transaction transferTransaction = new Transaction(
+                        user.getId(),
+                        "Transfer Out",
+                        new BigDecimal(-transferAmount),
+                        null
+                );
+
+                // this transaction will belong to the received user
+                Transaction receiveTransaction = new Transaction(
+                        result.getInt("id"),
+                        "Transfer In",
+                        new BigDecimal(transferAmount),
+                        null
+                );
+
+                // update received user
+                transferredUser.setCurrentBalance(transferredUser.getCurrentBalance().add(new BigDecimal(transferAmount)));
+                updateCurrentBalance(transferredUser);
+
+                // update sent user
+                user.setCurrentBalance(user.getCurrentBalance().subtract(new BigDecimal(transferAmount)));
+                updateCurrentBalance(user);
+
+                // add these transactions to database
+                addTransactionToDataBase(transferTransaction);
+                addTransactionToDataBase(receiveTransaction);
+
+                return true;
+            }
+        }catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
+
         return false;
     }
 }

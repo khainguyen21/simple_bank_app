@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 public class BankingAppDialog extends JDialog implements ActionListener {
     private User user;
     private BankingAppGui bankingAppGui;
+    private BankingAppDialog bankingAppDialog;
 
     private JLabel balanceLabel, enterAmountLabel, enterUserLabel;
     private JTextField enterAmountField, enterUserField;
@@ -68,7 +69,7 @@ public class BankingAppDialog extends JDialog implements ActionListener {
         enterAmountField = new JTextField();
         enterAmountField.setBounds(15, 80, getWidth() - 50, 40);
         enterAmountField.setFont(new Font("Dialog", Font.BOLD, 20));
-        enterAmountField.setHorizontalAlignment(SwingConstants.RIGHT);
+        enterAmountField.setHorizontalAlignment(SwingConstants.CENTER);
         add(enterAmountField);
 
     }
@@ -131,6 +132,9 @@ public class BankingAppDialog extends JDialog implements ActionListener {
 
             // reset the fields
             resetFieldsAndUpdateCurrentBalance();
+
+            // close dialog
+            this.dispose();
         }
         else{
             // show failure dialog
@@ -154,6 +158,32 @@ public class BankingAppDialog extends JDialog implements ActionListener {
         balanceLabel.setText("Balance: $" + user.getCurrentBalance());
 
         bankingAppGui.getCurrentBalance().setText("$ " + user.getCurrentBalance());
+    }
+
+    private void handleTransfer (User user, String transferredUser, float amountValue)
+    {
+        if(!user.getUsername().equals(transferredUser))
+        {
+            // attempt to perform transfer
+            if (MyJDBC.transfer(user, transferredUser, amountValue))
+            {
+                JOptionPane.showMessageDialog(this, "Transfer Success!");
+                resetFieldsAndUpdateCurrentBalance();
+                this.dispose();
+            }
+            else
+            {
+                JOptionPane.showMessageDialog(this, "Transfer Failed! Please make username is correct!");
+                resetFieldsAndUpdateCurrentBalance();
+
+            }
+        }
+
+        else {
+            JOptionPane.showMessageDialog(this, "Error: Cannot transfer money to yourself!");
+            resetFieldsAndUpdateCurrentBalance();
+        }
+
     }
 
     @Override
@@ -185,9 +215,15 @@ public class BankingAppDialog extends JDialog implements ActionListener {
                 if (buttonPressed.equalsIgnoreCase("Withdraw")) {
                     handleTransaction(buttonPressed, amountVal);
                 }
+
+                // transfer
                 else
                 {
+                    // get username
+                    String transferredUser = enterUserField.getText();
 
+                    // handle transfer
+                    handleTransfer(user, transferredUser, amountVal);
                 }
             }
         }
