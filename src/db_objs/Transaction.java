@@ -19,7 +19,7 @@ public class Transaction {
         return userId;
     }
 
-    public String transactionType() {
+    public String getTransactionType() {
         return transactionType;
     }
 

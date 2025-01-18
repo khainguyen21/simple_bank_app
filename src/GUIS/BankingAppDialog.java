@@ -9,6 +9,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 
 /*
     Displays a custom dialog for our BankingAppGui
@@ -21,6 +22,9 @@ public class BankingAppDialog extends JDialog implements ActionListener {
     private JLabel balanceLabel, enterAmountLabel, enterUserLabel;
     private JTextField enterAmountField, enterUserField;
     private JButton actionButton;
+    private JPanel pastTransactionPanel;
+    private ArrayList<Transaction> pastTransactions;
+
 
     public BankingAppDialog (BankingAppGui bankingAppGui, User user)
     {
@@ -49,6 +53,7 @@ public class BankingAppDialog extends JDialog implements ActionListener {
         //addCurrentBalanceAndAmount();
     }
 
+    // this gui is deposit, withdraw and transfer
     public void addCurrentBalanceAndAmount()
     {
         // balance label
@@ -74,7 +79,7 @@ public class BankingAppDialog extends JDialog implements ActionListener {
 
     }
 
-    // display actions between deposit, withdraw, and transfer
+    // this gui button display is for deposit, withdraw, and transfer
     public void addActionButton (String action)
     {
         actionButton = new JButton(action);
@@ -86,6 +91,7 @@ public class BankingAppDialog extends JDialog implements ActionListener {
 
     }
 
+    // this gui is for transfer
     public void addUserField()
     {
         // enter user label
@@ -102,6 +108,64 @@ public class BankingAppDialog extends JDialog implements ActionListener {
         enterUserField.setHorizontalAlignment(SwingConstants.CENTER);
         add(enterUserField);
     }
+
+    public void addPastTransactionComponents()
+    {
+        // container where we will still store each transaction
+        pastTransactionPanel = new JPanel();
+
+        // make layout 1x1
+        pastTransactionPanel.setLayout(new BoxLayout(pastTransactionPanel, BoxLayout.Y_AXIS));
+
+        // add scroll ability to the container
+        JScrollPane scrollPane = new JScrollPane(pastTransactionPanel);
+
+        // displays the vertical scroll only when it is required
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setBounds(0, 20, getWidth() - 15, getHeight() - 80);
+
+        // perform db call to retrieve all the past transaction and store into array list
+        pastTransactions = MyJDBC.getPastTransaction(user);
+
+        // iterate through the list and add to the gui
+        for (Transaction pastTransaction : pastTransactions) {
+
+            // create a container to store an individual transaction
+            JPanel pastTransactionContainer = new JPanel();
+            pastTransactionContainer.setLayout(new BorderLayout());
+
+            // create transaction type label
+            JLabel transactionTypeLabel = new JLabel(pastTransaction.getTransactionType());
+            transactionTypeLabel.setFont(new Font("Dialog", Font.BOLD, 20));
+
+            // create transaction amount label
+            JLabel transactionAmountLabel = new JLabel(pastTransaction.getTransactionAmount().toString());
+            transactionAmountLabel.setFont(new Font("Dialog", Font.BOLD, 20));
+
+            // create transaction date label
+            JLabel transactionDateLabel = new JLabel(pastTransaction.getTransactionDate().toString());
+            transactionDateLabel.setFont(new Font("Dialog", Font.BOLD, 20));
+            transactionDateLabel.setHorizontalAlignment(SwingConstants.CENTER);
+
+            // add to the container
+            pastTransactionContainer.add(transactionTypeLabel, BorderLayout.WEST);
+            pastTransactionContainer.add(transactionAmountLabel, BorderLayout.EAST);
+            pastTransactionContainer.add(transactionDateLabel, BorderLayout.NORTH);
+
+            // give a white background to each container
+            pastTransactionContainer.setBackground(Color.WHITE);
+
+            // give a black border to each transaction container with 3px thickness
+            pastTransactionContainer.setBorder(BorderFactory.createLineBorder(Color.BLACK, 3));
+
+            // add transaction component to the transaction panel
+            pastTransactionPanel.add(pastTransactionContainer);
+        }
+
+        // add to the dialog
+        add(scrollPane);
+    }
+
 
     public void handleTransaction (String transactionType, float amountVal)
     {
@@ -139,7 +203,6 @@ public class BankingAppDialog extends JDialog implements ActionListener {
         else{
             // show failure dialog
             JOptionPane.showMessageDialog(this, transactionType + " Failed");
-
         }
     }
 
@@ -162,23 +225,32 @@ public class BankingAppDialog extends JDialog implements ActionListener {
 
     private void handleTransfer (User user, String transferredUser, float amountValue)
     {
+        // make sure user cannot transfer themselves
         if(!user.getUsername().equals(transferredUser))
         {
             // attempt to perform transfer
             if (MyJDBC.transfer(user, transferredUser, amountValue))
             {
+                // show success dialog
                 JOptionPane.showMessageDialog(this, "Transfer Success!");
+
+                // reset the text field
                 resetFieldsAndUpdateCurrentBalance();
+
+                // close banking app dialog
                 this.dispose();
             }
             else
             {
+                // show failed dialog
                 JOptionPane.showMessageDialog(this, "Transfer Failed! Please make username is correct!");
-                resetFieldsAndUpdateCurrentBalance();
 
+                // reset all text field
+                resetFieldsAndUpdateCurrentBalance();
             }
         }
 
+        // otherwise display dialog with error message
         else {
             JOptionPane.showMessageDialog(this, "Error: Cannot transfer money to yourself!");
             resetFieldsAndUpdateCurrentBalance();
@@ -194,7 +266,7 @@ public class BankingAppDialog extends JDialog implements ActionListener {
         float amountVal = Float.parseFloat(enterAmountField.getText());
 
         // make sure input amount is positive
-        if (amountVal >=0)
+        if (amountVal >= 0)
         {
             // pressed deposit
             if (buttonPressed.equalsIgnoreCase("Deposit")) {
@@ -204,33 +276,43 @@ public class BankingAppDialog extends JDialog implements ActionListener {
 
             // pressed transfer and withdraw
             else {
-            // validate input amount by check if withdraw or transfer amount is less than current balance
+
+                // 0: if the two BigDecimal objects are equal.
+                // -1: if the first BigDecimal object is less than the second.
+                // 1: if the first BigDecimal object is greater than the second.
                 int result = user.getCurrentBalance().compareTo(new BigDecimal(amountVal));
-                if (result < 0) {
-                    JOptionPane.showMessageDialog(this, "Error: Input value is more than current balance.");
-                    return;
+
+                // validate input amount by check if withdraw or transfer amount is less than current balance
+                if (result >= 0) {
+
+                    // implement withdraw
+                    if (buttonPressed.equalsIgnoreCase("Withdraw"))
+                    {
+                        // handle withdraw
+                        handleTransaction(buttonPressed, amountVal);
+                    }
+
+                    // implement transfer
+                    else
+                    {
+                        // get username to transfer
+                        String transferredUser = enterUserField.getText();
+
+                        // handle transfer
+                        handleTransfer(user, transferredUser, amountVal);
+                    }
                 }
 
-                // otherwise implement withdraw
-                if (buttonPressed.equalsIgnoreCase("Withdraw")) {
-                    handleTransaction(buttonPressed, amountVal);
-                }
-
-                // transfer
-                else
-                {
-                    // get username
-                    String transferredUser = enterUserField.getText();
-
-                    // handle transfer
-                    handleTransfer(user, transferredUser, amountVal);
+                // otherwise display dialog with error message
+                else {
+                    JOptionPane.showMessageDialog(this, "Error: Input value has to be less than current balance");
                 }
             }
         }
+
+        // otherwise display dialog with error message
         else {
             JOptionPane.showMessageDialog(this, "Error: Cannot input negative amount.");
         }
-
-
     }
 }
