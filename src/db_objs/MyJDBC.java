@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class MyJDBC {
     private static final String DB_URL = "jdbc:mysql://127.0.0.1:3306/bankapp";
     private static final String DB_USERNAME = "root";
-    private static final String DB_PASSWORD = "Khai211004@";
+    private static final String DB_PASSWORD = "testing123@!";
 
     // if valid return an object with the user's information
     public static User validateLogin(String username, String password) {

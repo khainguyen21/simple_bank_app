@@ -17,7 +17,7 @@ public class RegisterGui extends BaseFrame{
     }
     @Override
     protected void addGuiComponents() {
-        // create banking app label
+        // create a banking app label
         JLabel bankingAppLabel = new JLabel("Banking Application");
 
         // set the location for banking app label, super.getWidth

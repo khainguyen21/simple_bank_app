@@ -262,57 +262,65 @@ public class BankingAppDialog extends JDialog implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         String buttonPressed = e.getActionCommand();
 
-        // get amount val
-        float amountVal = Float.parseFloat(enterAmountField.getText());
+        // Get the string version of the amount
+        String amountValStr = enterAmountField.getText().trim();
 
-        // make sure input amount is positive
-        if (amountVal >= 0)
-        {
-            // pressed deposit
-            if (buttonPressed.equalsIgnoreCase("Deposit")) {
-                // we want to handle the deposit transaction
-                handleTransaction(buttonPressed, amountVal);
-            }
+        // Check if the amount filed is not empty
+        if (!amountValStr.isEmpty()) {
+            // get amount val
+            float amountVal  = Float.parseFloat(enterAmountField.getText());
 
-            // pressed transfer and withdraw
-            else {
-
-                // 0: if the two BigDecimal objects are equal.
-                // -1: if the first BigDecimal object is less than the second.
-                // 1: if the first BigDecimal object is greater than the second.
-                int result = user.getCurrentBalance().compareTo(new BigDecimal(amountVal));
-
-                // validate input amount by check if withdraw or transfer amount is less than current balance
-                if (result >= 0) {
-
-                    // implement withdraw
-                    if (buttonPressed.equalsIgnoreCase("Withdraw"))
-                    {
-                        // handle withdraw
-                        handleTransaction(buttonPressed, amountVal);
-                    }
-
-                    // implement transfer
-                    else
-                    {
-                        // get username to transfer
-                        String transferredUser = enterUserField.getText();
-
-                        // handle transfer
-                        handleTransfer(user, transferredUser, amountVal);
-                    }
+            // make sure the input amount is positive
+            if (amountVal >= 0) {
+                // pressed deposit
+                if (buttonPressed.equalsIgnoreCase("Deposit")) {
+                    // we want to handle the deposit transaction
+                    handleTransaction(buttonPressed, amountVal);
                 }
 
-                // otherwise display dialog with error message
+                // pressed transfer and withdraw
                 else {
-                    JOptionPane.showMessageDialog(this, "Error: Input value has to be less than current balance");
+
+                    // 0: if the two BigDecimal objects are equal.
+                    // -1: if the first BigDecimal object is less than the second.
+                    // 1: if the first BigDecimal object is greater than the second.
+                    int result = user.getCurrentBalance().compareTo(new BigDecimal(amountVal));
+
+                    // validate input amount by check if withdraw or transfer amount is less than current balance
+                    if (result >= 0) {
+
+                        // implement withdraw
+                        if (buttonPressed.equalsIgnoreCase("Withdraw")) {
+                            // handle withdraw
+                            handleTransaction(buttonPressed, amountVal);
+                        }
+
+                        // implement transfer
+                        else {
+                            // get username to transfer
+                            String transferredUser = enterUserField.getText();
+
+                            // handle transfer
+                            handleTransfer(user, transferredUser, amountVal);
+                        }
+                    }
+
+                    // otherwise display dialog with error message
+                    else {
+                        JOptionPane.showMessageDialog(this, "Error: Input value has to be less than current balance");
+                    }
                 }
             }
+
+            // otherwise display dialog with an error message
+            else {
+                JOptionPane.showMessageDialog(this, "Error: Cannot input negative amount.");
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Error: Please make sure to fill out correct amount and valid username");
+
         }
 
-        // otherwise display dialog with error message
-        else {
-            JOptionPane.showMessageDialog(this, "Error: Cannot input negative amount.");
-        }
+
     }
 }

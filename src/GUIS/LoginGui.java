@@ -44,19 +44,19 @@ public class LoginGui extends BaseFrame {
         usernameLabel.setFont(new Font("Dialog", Font.PLAIN, 20));
         add(usernameLabel);
 
-        // create username text field
+        // create a username text field
         JTextField usernameField = new JTextField();
         usernameField.setBounds(20, 160, getWidth() - 50, 40);
         usernameField.setFont(new Font("Dialog", Font.PLAIN, 28));
         add(usernameField);
 
-        // create password label
+        // create a password label
         JLabel passwordLabel = new JLabel("Password: ");
         passwordLabel.setBounds(20, 280, getWidth() - 30, 24);
         passwordLabel.setFont(new Font("Dialog", Font.PLAIN, 20));
         add(passwordLabel);
 
-        // create password text field
+        // create the password text field
         JPasswordField passwordField = new JPasswordField();
         passwordField.setBounds(20, 320, getWidth() - 50 , 40);
         passwordField.setFont(new Font("Dialog", Font.PLAIN, 28));
@@ -110,7 +110,7 @@ public class LoginGui extends BaseFrame {
         registerLabel.setHorizontalAlignment(SwingConstants.CENTER);
         registerLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-        // adds an event listener so when the mouse is clicked it will launch the register gui
+        // adds an event listener so when the mouse is clicked, it will launch the register gui
         registerLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
