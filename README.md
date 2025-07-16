@@ -128,12 +128,4 @@ src/
 
 ---
 
-## 💡 Tips for Beginners
-
-- Explore the `src/GUIS/BankingAppGui.java` and `src/db_objs/MyJDBC.java` files to understand how the GUI and database work together.
-- Try changing the GUI labels and observe how it affects the interface.
-- Experiment with database queries to see how transactions are stored.
-
----
-
 Happy coding! 🚀
