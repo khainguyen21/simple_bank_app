@@ -57,7 +57,7 @@ cd simple_bank_app
 4. **Configure your MySQL credentials:**  
    - Default values in the code (see `MyJDBC.java`):
      - **DB Username:** `root`
-     - **DB Password:** `Khai211004@`
+     - **DB Password:** `testing123@!`
      - **DB URL:** `jdbc:mysql://127.0.0.1:3306/bankapp`
    - If you use different credentials, update them in `src/db_objs/MyJDBC.java`.
 
