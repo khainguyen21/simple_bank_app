@@ -124,7 +124,7 @@ src/
 
 ## 🏆 Credits
 
-- Author: [khainguyen21](https://github.com/khainguyen21)
+- Author: [khainguyen21](https://github.com/khainguyen21) , [Phil]
 
 ---
 
